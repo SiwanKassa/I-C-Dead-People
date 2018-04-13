@@ -207,7 +207,8 @@ int main()
   
     reflectance_start();
     reflectance_set_threshold(9000, 9000, 11000, 11000, 9000, 9000); // set center sensor threshold to 11000 and others to 9000
-    
+    motor_start();
+    motor_forward(0,0);
 
     for(;;)
     {
@@ -220,20 +221,20 @@ int main()
         reflectance_digital(&dig);      //print out 0 or 1 according to results of reflectance period
         printf("%5d %5d %5d %5d %5d %5d \r\n", dig.l3, dig.l2, dig.l1, dig.r1, dig.r2, dig.r3);        //print out 0 or 1 according to results of reflectance period
         
-        CyDelay(200);
-        motor_start();
-        if (dig.l1 == 0 || dig.r1 == 0){
+        CyDelay(50);
+        
+        if (dig.l1 == 1 && dig.r1 == 1){
             motor_forward(100,1);
         }
-        if(dig.l2 == 0 && dig.l1 == 0){
+        else if (dig.l2 == 1 && dig.l1 == 1){
             motor_turn(50,100,1);
         }
-        if(dig.r2 == 0 && dig.r1 == 0){
+        else if (dig.r2 == 1 && dig.r1 == 1){
             motor_turn(100,50,1);
         }
         
-        if (dig.l1 == 1 && dig.r1 == 1){
-            motor_stop();
+        else if (dig.l1 == 0 && dig.r1 == 0){
+            motor_forward(0,0);
         }
     }
     
