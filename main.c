@@ -208,7 +208,9 @@ int main()
     reflectance_start();
     reflectance_set_threshold(9000, 9000, 11000, 11000, 9000, 9000); // set center sensor threshold to 11000 and others to 9000
     motor_start();
-    motor_forward(0,0);
+    //motor_forward(0,0);
+    MotorDirLeft_Write (0);
+    MotorDirRight_Write (0);
 
     for(;;)
     {
@@ -221,21 +223,32 @@ int main()
         reflectance_digital(&dig);      //print out 0 or 1 according to results of reflectance period
         printf("%5d %5d %5d %5d %5d %5d \r\n", dig.l3, dig.l2, dig.l1, dig.r1, dig.r2, dig.r3);        //print out 0 or 1 according to results of reflectance period
         
-        CyDelay(50);
-        
-        if (dig.l1 == 1 && dig.r1 == 1){
-            motor_forward(100,1);
-        }
-        else if (dig.l2 == 1 && dig.l1 == 1){
-            motor_turn(50,100,1);
-        }
-        else if (dig.r2 == 1 && dig.r1 == 1){
-            motor_turn(100,50,1);
-        }
-        
-        else if (dig.l1 == 0 && dig.r1 == 0){
+        CyDelay(3);
+        //{1 1 1 1 1 1} stop
+        if (dig.l1 == 1 && dig.l2 == 1 && dig.l3 == 1 && dig.r1 == 1 && dig.r2 == 1 && dig.r3 == 1){
             motor_forward(0,0);
         }
+        //{0 0 1 1 0 0} forward 
+        else if (dig.l1 == 1 && dig.r1 == 1){
+            motor_forward(100,1);
+        }
+        //{0 1 1 0 0 0} left  
+        else if (dig.l2 == 1 && dig.l1 == 1){
+            motor_turn(25,100,1);
+        }
+        //{0 0 0 1 1 0} right 
+        else if (dig.r2 == 1 && dig.r1 == 1){
+            motor_turn(100,25,1);
+        }
+        //{0 0 0 0 0 1} hard left 
+        else if (dig.l3 == 1){
+            motor_turnLeft(100,1);
+        }
+        //{1 0 0 0 0 0} hard right
+        else if(dig.r3 == 1){
+            motor_turnRight(100,1);
+        }
+        
     }
     
 }   
