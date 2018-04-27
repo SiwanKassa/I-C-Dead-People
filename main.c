@@ -193,7 +193,7 @@ void motor_turnLeft (uint8 speed,uint32 delay) {
     CyDelay (delay);
 }
 
-#if 1
+#if 0
 //reflectance//
 int main()
 {
@@ -258,7 +258,7 @@ int main()
                 secondLine++;
             }
             if (secondLinePassed >= 1){
-                motor_forward(0,0);
+                motor_stop();
                 ShieldLed_Write (1);
             }
             
@@ -333,8 +333,92 @@ int main()
     
 }   
 #endif
+#if 1
+    //Sumo//
+ int main()
+{
+    struct sensors_ ref;
+    struct sensors_ dig;   
+    bool StartSignal = true;
 
+    Systick_Start();
 
+    CyGlobalIntEnable; 
+    UART_1_Start();
+    IR_Start();
+    Ultra_Start();
+  
+    reflectance_start();
+    CyDelay(2);
+    reflectance_set_threshold(9000, 9000, 11000, 11000, 9000, 9000); // set center sensor threshold to 11000 and others to 9000
+    motor_start();
+    //motor_forward(0,0);
+    MotorDirLeft_Write (0);
+    MotorDirRight_Write (0);
+    
+    //Robot reaches starting line and stops
+    while(StartSignal == true)
+    {
+        reflectance_read(&ref);
+        reflectance_digital(&dig);
+        // Stops robot at starting line
+        if (dig.l1 == 1 && dig.l2 == 1 && dig.l3 == 1 && dig.r1 == 1 && dig.r2 == 1 && dig.r3 == 1){
+            motor_forward (0,0);
+            IR_wait();
+            StartSignal = false;
+            motor_forward(75,1000);
+        }// Moves robot forward until it reaches the startingline
+        else {
+            motor_forward (75,1);
+        }
+    }
+    // Ultrasound seeker routine
+    int dir = 0;
+     for(;;)
+    {
+        // Gets data from sensors
+        int d = Ultra_GetDistance();
+        reflectance_digital(&dig);
+        CyDelay(1);
+        
+        // If IR sensors are active zumo moves backward and turns
+        if (dig.l3 == 1)
+        {
+            motor_backward(200,250);
+            motor_turnRight(150,100);   
+        }
+        else if (dig.r3 == 1)
+        {
+            motor_backward(200,250);
+            motor_turnRight(150,100);   
+        }
+        //If zumo doesn't detect targets ear enough it turns left until it finds a target
+        else if (d > 50)
+        {
+          if (dir == 0)
+            {
+                motor_turnRight(150,1);
+                dir = 0;
+            }
+         else if (dir == 1)
+            {
+                motor_turnLeft(150,500);
+                dir = 0;
+            }
+        }
+        //If zumo detects a target it goes towards it
+        else if (d <= 50)
+        {
+            motor_forward (200,1);
+        }
+        
+    }
+    
+}
+    
+    
+    
+#endif
 #if 0
 //motor//
 int main()
