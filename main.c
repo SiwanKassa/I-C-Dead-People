@@ -366,7 +366,7 @@ int main()
             motor_forward (0,0);
             IR_wait();
             StartSignal = false;
-            motor_forward(75,1000);
+            motor_forward(250,200);
         }// Moves robot forward until it reaches the startingline
         else {
             motor_forward (75,1);
@@ -406,10 +406,14 @@ int main()
                 dir = 0;
             }
         }
-        //If zumo detects a target it goes towards it
+        //While zumo detects a target it goes towards it
         else if (d <= 50)
         {
-            motor_forward (200,1);
+            while (d <=50)
+            {
+                motor_forward (250,1);
+                d = Ultra_GetDistance();
+            }
         }
         
     }
