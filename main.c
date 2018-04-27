@@ -374,12 +374,14 @@ int main()
     }
     // Ultrasound seeker routine
     int dir = 0;
+    bool stop =true;
      for(;;)
     {
         // Gets data from sensors
         int d = Ultra_GetDistance();
         reflectance_digital(&dig);
         CyDelay(1);
+        stop = true;
         
         // If IR sensors are active zumo moves backward and turns
         if (dig.l3 == 1)
@@ -393,7 +395,7 @@ int main()
             motor_turnRight(150,100);   
         }
         //If zumo doesn't detect targets ear enough it turns left until it finds a target
-        else if (d > 50)
+        else if (d > 40)
         {
           if (dir == 0)
             {
@@ -407,12 +409,16 @@ int main()
             }
         }
         //While zumo detects a target it goes towards it
-        else if (d <= 50)
+        else if (d <= 40)
         {
-            while (d <=50)
+            while (stop == true)
             {
-                motor_forward (250,1);
-                d = Ultra_GetDistance();
+                motor_forward (255,1);
+                reflectance_digital(&dig);
+                if (dig.r3 == 1 || dig.l3 == 1)
+                {
+                    stop = false;
+                }
             }
         }
         
