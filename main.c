@@ -279,7 +279,7 @@ int main()
             }
         }
         
-        //{0 0 1 1 0 0} forward : also checks how many lines have been passed
+        //{0 0 1 1 0 0} forward 
         else if (dig.l1 == 1 && dig.r1 == 1){
             motor_forward(250,2);
            
@@ -394,7 +394,7 @@ int main()
             motor_backward(200,250);
             motor_turnRight(150,100);   
         }
-        //If zumo doesn't detect targets ear enough it turns left until it finds a target
+        //If zumo doesn't detect targets near enough it turns right until it finds a target
         else if (d > 40)
         {
           if (dir == 0)
@@ -408,7 +408,7 @@ int main()
                 dir = 0;
             }
         }
-        //While zumo detects a target it goes towards it
+        //While zumo detects a target it goes towards it until it reaches a black line
         else if (d <= 40)
         {
             while (stop == true)
